@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+// use App\Models\Buku;
+// use Illuminate\Contracts\View\View;
 use App\Models\Buku;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class BukuController extends Controller
 {
@@ -35,4 +40,17 @@ class BukuController extends Controller
 
         return view('buku.show')->with('buku', $buku);
     }
+
+    // PENGUJIAN SQL INJECTION A2
+
+public function cari(Request $request): JsonResponse
+{
+    $judul = $request->query('judul', '');
+
+    $hasil = DB::select(
+        "SELECT * FROM bukus WHERE judul = '$judul'"
+    );
+
+    return response()->json($hasil);
+}
 }

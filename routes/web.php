@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\BukuController as ApiBukuController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\RiwayatPeminjamanController;
@@ -9,6 +10,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 
+
+Route::get('/peminjaman/{id}', [
+    PeminjamanController::class,
+    'show'
+])
+->middleware('auth')
+->whereNumber('id')
+->name('peminjaman.show');
 
 // HALAMAN UTAMA
 
@@ -39,6 +48,23 @@ Route::get('/buku/{id}', [
 ])
 ->name('buku.show');
 
+// PENGUJIAN CSRF A3
+
+Route::get('/buku/{buku}/hapus', [
+    ApiBukuController::class,
+    'destroy'
+])
+->middleware('auth')
+->name('buku.hapus.get');
+
+// // PENGUJIAN SQL INJECTION A2
+
+Route::get('/buku-cari', [
+    BukuController::class,
+    'cari'
+])
+->middleware('auth')
+->name('buku.cari');
 
 // PENGAJUAN PEMINJAMAN BUKU
 

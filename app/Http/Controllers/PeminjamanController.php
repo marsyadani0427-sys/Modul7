@@ -28,6 +28,20 @@ class PeminjamanController extends Controller
         );
     }
 
+// A4: Menampilkan detail peminjaman (rentan IDOR)
+public function show(int $id): View
+{
+    $peminjaman = Peminjaman::with([
+        'anggota.user',
+        'buku'
+    ])->findOrFail($id);
+
+    return view(
+        'peminjaman.detail',
+        compact('peminjaman')
+    );
+}
+
     // Pengajuan peminjaman oleh Siswa
     public function store(
         Request $request,

@@ -56,12 +56,50 @@
             @endcan
         </tr>
     </thead>
-<tbody id="isi-tabel">
+   
+<!-- <tbody id="isi-tabel">
     <tr>
         <td colspan="{{ auth()->user()->can('kelola data buku') ? 6 : 5 }}">
             Memuat data...
         </td>
     </tr>
+</tbody> -->
+
+    <tbody id="isi-tabel">
+
+    @forelse ($daftarBuku as $i => $buku)
+        <tr>
+            <td>{{ $i + 1 }}</td>
+            <td>{{ $buku['kategori'] }}</td>
+
+            {{-- CELAH XSS A1 --}}
+            <td>{!! $buku['judul'] !!}</td>
+
+            <td>{{ $buku['penulis'] }}</td>
+            <td>{{ $buku['tahun_terbit'] }}</td>
+
+            @can('kelola data buku')
+                <td>
+                    <button type="button"
+                        onclick="mulaiUbah({{ $buku['id'] }})">
+                        Ubah
+                    </button>
+
+                    <button type="button"
+                        onclick="hapusBuku({{ $buku['id'] }})">
+                        Hapus
+                    </button>
+                </td>
+            @endcan
+        </tr>
+    @empty
+        <tr>
+            <td colspan="{{ auth()->user()->can('kelola data buku') ? 6 : 5 }}">
+                Belum ada data buku.
+            </td>
+        </tr>
+    @endforelse
+
 </tbody>
 </table>
 
@@ -173,8 +211,38 @@ function tampilkanTabel(daftar) {
         `;
     }).join('');
 }
+//yg lama
+//   async function ambilBuku() {
+//     try {
+//         const hasil = await kirimRequest(API_URL);
 
-  async function ambilBuku() {
+//         if (!Array.isArray(hasil.data)) {
+//             throw new Error('Format data dari API tidak sesuai.');
+//         }
+
+//         daftarBuku = hasil.data;
+
+//         tampilkanTabel(daftarBuku);
+
+//     } catch (error) {
+
+//         isiTabel.innerHTML = `
+//             <tr>
+//                 <td colspan="${JUMLAH_KOLOM}">
+//                     Data gagal dimuat.
+//                 </td>
+//             </tr>
+//         `;
+
+//         tampilkanPesan(
+//             'Gagal mengambil data buku. ' + error.message,
+//             false
+//         );
+//     }
+// }
+
+//yg baru
+async function ambilBuku(tampilkan = true) {
     try {
         const hasil = await kirimRequest(API_URL);
 
@@ -184,17 +252,21 @@ function tampilkanTabel(daftar) {
 
         daftarBuku = hasil.data;
 
-        tampilkanTabel(daftarBuku);
+        if (tampilkan) {
+            tampilkanTabel(daftarBuku);
+        }
 
     } catch (error) {
 
-        isiTabel.innerHTML = `
-            <tr>
-                <td colspan="${JUMLAH_KOLOM}">
-                    Data gagal dimuat.
-                </td>
-            </tr>
-        `;
+        if (tampilkan) {
+            isiTabel.innerHTML = `
+                <tr>
+                    <td colspan="${JUMLAH_KOLOM}">
+                        Data gagal dimuat.
+                    </td>
+                </tr>
+            `;
+        }
 
         tampilkanPesan(
             'Gagal mengambil data buku. ' + error.message,
@@ -308,7 +380,10 @@ if (tombolBatal) {
     });
 
 }
+//yg lama
+    // ambilBuku();
 
-    ambilBuku();
+    //yg baru
+    ambilBuku(false);
 </script>
 @endsection
