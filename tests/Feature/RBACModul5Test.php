@@ -322,4 +322,31 @@ class RBACModul5Test extends TestCase
                 ->assertRedirect(route('login'));
         }
     }
+
+
+
+// TEST SQL INJECTION A2
+public function test_pencarian_buku_aman_dari_sql_injection(): void
+{
+    $siswa = $this->buatAkun('siswa');
+    $buku = $this->buatBuku('Buku Aman SQL');
+
+    // Pengujian pencarian normal
+    $this->actingAs($siswa)
+        ->getJson(route('buku.cari', [
+            'judul' => $buku->judul
+        ]))
+        ->assertOk()
+        ->assertJsonFragment([
+            'judul' => 'Buku Aman SQL'
+        ]);
+
+    // Pengujian input SQL Injection
+    $this->getJson(route('buku.cari', [
+        'judul' => "' OR '1'='1"
+    ]))
+        ->assertOk()
+        ->assertExactJson([]);
+}
+
 }

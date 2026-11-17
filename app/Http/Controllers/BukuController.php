@@ -42,13 +42,14 @@ class BukuController extends Controller
     }
 
     // PENGUJIAN SQL INJECTION A2
-
 public function cari(Request $request): JsonResponse
 {
     $judul = $request->query('judul', '');
 
+    // Menggunakan parameter binding untuk mencegah SQL Injection
     $hasil = DB::select(
-        "SELECT * FROM bukus WHERE judul = '$judul'"
+        'SELECT * FROM bukus WHERE judul = ?',
+        [$judul]
     );
 
     return response()->json($hasil);

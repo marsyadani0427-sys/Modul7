@@ -50,7 +50,7 @@ Route::get('/buku/{id}', [
 
 // PENGUJIAN CSRF A3
 
-Route::get('/buku/{buku}/hapus', [
+Route::delete('/buku/{buku}', [
     ApiBukuController::class,
     'destroy'
 ])

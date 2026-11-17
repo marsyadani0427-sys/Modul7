@@ -73,7 +73,7 @@
             <td>{{ $buku['kategori'] }}</td>
 
             {{-- CELAH XSS A1 --}}
-            <td>{!! $buku['judul'] !!}</td>
+            <td>{{ $buku['judul'] }}</td>
 
             <td>{{ $buku['penulis'] }}</td>
             <td>{{ $buku['tahun_terbit'] }}</td>
@@ -102,6 +102,11 @@
 
 </tbody>
 </table>
+
+<form id="form-hapus-buku" method="POST" hidden>
+    @csrf
+    @method('DELETE')
+</form>
 
 <script>
     const API_URL = '/api/buku';
@@ -301,27 +306,72 @@ async function ambilBuku(tampilkan = true) {
         form.scrollIntoView({ behavior: 'smooth' });
     }
 
-    async function hapusBuku(id) {
-        const buku = daftarBuku.find((item) => item.id === id);
-        const judul = buku ? buku.judul : 'ini';
+    // async function hapusBuku(id) {
+    //     const buku = daftarBuku.find((item) => item.id === id);
+    //     const judul = buku ? buku.judul : 'ini';
 
-        if (!confirm(`Hapus buku "${judul}"?`)) {
-            return;
-        }
+    //     if (!confirm(`Hapus buku "${judul}"?`)) {
+    //         return;
+    //     }
 
-        try {
-            const hasil = await kirimRequest(`${API_URL}/${id}`, 'DELETE');
+    //     try {
+    //         const hasil = await kirimRequest(`${API_URL}/${id}`, 'DELETE');
 
-            if (inputId.value === String(id)) {
-                resetForm();
-            }
+    //         if (inputId.value === String(id)) {
+    //             resetForm();
+    //         }
 
-            tampilkanPesan(hasil.message || 'Buku berhasil dihapus.', true);
-            await ambilBuku();
-        } catch (error) {
-            tampilkanPesan(error.message, false);
-        }
+    //         tampilkanPesan(hasil.message || 'Buku berhasil dihapus.', true);
+    //         await ambilBuku();
+    //     } catch (error) {
+    //         tampilkanPesan(error.message, false);
+    //     }
+    // }
+
+    const formHapus = document.getElementById('form-hapus-buku');
+
+async function hapusBuku(id) {
+    const buku = daftarBuku.find(item => item.id === id);
+    const judul = buku ? buku.judul : 'ini';
+
+    if (!confirm(`Hapus buku "${judul}"?`)) {
+        return;
     }
+
+    try {
+        formHapus.action = `/buku/${id}`;
+
+        const response = await fetch(formHapus.action, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            },
+            body: new FormData(formHapus)
+        });
+
+        const hasil = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(
+                hasil.message || `Gagal menghapus buku (${response.status})`
+            );
+        }
+
+        if (inputId.value === String(id)) {
+            resetForm();
+        }
+
+        tampilkanPesan(
+            hasil.message || 'Buku berhasil dihapus.',
+            true
+        );
+
+        await ambilBuku();
+
+    } catch (error) {
+        tampilkanPesan(error.message, false);
+    }
+}
 
   // Event form hanya dipasang jika form tersedia
 if (form) {
