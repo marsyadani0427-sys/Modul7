@@ -323,6 +323,60 @@ class RBACModul5Test extends TestCase
         }
     }
 
+    // TEST 13: Perlindungan IDOR pada detail peminjaman
+public function test_idor_detail_peminjaman_dibatasi_berdasarkan_role(): void
+{
+    // Membuat dua siswa, admin, dan petugas
+    $siswaSatu = $this->buatAkun('siswa');
+    $siswaDua = $this->buatAkun('siswa');
+    $admin = $this->buatAkun('admin');
+    $petugas = $this->buatAkun('petugas');
+
+    // Membuat buku dan transaksi peminjaman
+    $bukuSatu = $this->buatBuku('Buku IDOR Siswa Satu');
+    $bukuDua = $this->buatBuku('Buku IDOR Siswa Dua');
+
+    $pinjamanSatu = $this->buatPeminjaman(
+        $siswaSatu,
+        $bukuSatu
+    );
+
+    $pinjamanDua = $this->buatPeminjaman(
+        $siswaDua,
+        $bukuDua
+    );
+
+    // 1. Siswa satu dapat melihat peminjaman miliknya
+    $this->actingAs($siswaSatu)
+        ->get(route('peminjaman.show', $pinjamanSatu->id))
+        ->assertOk();
+
+    // 2. Siswa satu tidak dapat melihat peminjaman siswa dua
+    $this->actingAs($siswaSatu)
+        ->get(route('peminjaman.show', $pinjamanDua->id))
+        ->assertForbidden();
+
+    // 3. Siswa dua dapat melihat peminjaman miliknya
+    $this->actingAs($siswaDua)
+        ->get(route('peminjaman.show', $pinjamanDua->id))
+        ->assertOk();
+
+    // 4. Admin dapat melihat peminjaman siswa lain
+    $this->actingAs($admin)
+        ->get(route('peminjaman.show', $pinjamanSatu->id))
+        ->assertOk();
+
+    $this->get(route('peminjaman.show', $pinjamanDua->id))
+        ->assertOk();
+
+    // 5. Petugas dapat melihat peminjaman siswa lain
+    $this->actingAs($petugas)
+        ->get(route('peminjaman.show', $pinjamanSatu->id))
+        ->assertOk();
+
+    $this->get(route('peminjaman.show', $pinjamanDua->id))
+        ->assertOk();
+}
 
 
 // TEST SQL INJECTION A2

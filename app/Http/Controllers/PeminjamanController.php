@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class PeminjamanController extends Controller
 {
@@ -29,6 +30,55 @@ class PeminjamanController extends Controller
     }
 
 // A4: Menampilkan detail peminjaman (rentan IDOR)
+// public function show(int $id): View
+// {
+//     $peminjaman = Peminjaman::with([
+//         'anggota.user',
+//         'buku'
+//     ])->findOrFail($id);
+
+//     return view(
+//         'peminjaman.detail',
+//         compact('peminjaman')
+//     );
+// }
+
+// A4: Perlindungan IDOR pada detail peminjaman
+// public function show(Request $request, int $id): View
+// {
+//     $user = $request->user();
+
+//     $query = Peminjaman::with([
+//         'anggota.user',
+//         'buku'
+//     ]);
+
+//     // Admin dan petugas yang memiliki permission
+//     // kelola peminjaman boleh melihat semua detail.
+//     if (!$user->can('kelola peminjaman')) {
+
+//         // Siswa hanya boleh melihat peminjaman miliknya.
+//         if ($user->hasRole('siswa')) {
+
+//             $query->whereHas('anggota.user', function ($q) use ($user) {
+//                 $q->where('id', $user->id);
+//             });
+
+//         } else {
+//             abort(403, 'Anda tidak memiliki akses.');
+//         }
+//     }
+
+//     $peminjaman = $query->findOrFail($id);
+
+//     return view(
+//         'peminjaman.detail',
+//         compact('peminjaman')
+//     );
+// }
+
+
+// A4: Menampilkan detail peminjaman dengan Policy
 public function show(int $id): View
 {
     $peminjaman = Peminjaman::with([
@@ -36,11 +86,16 @@ public function show(int $id): View
         'buku'
     ])->findOrFail($id);
 
+    // Memeriksa hak akses menggunakan PeminjamanPolicy
+    Gate::authorize('view', $peminjaman);
+
     return view(
         'peminjaman.detail',
         compact('peminjaman')
     );
 }
+
+
 
     // Pengajuan peminjaman oleh Siswa
     public function store(
