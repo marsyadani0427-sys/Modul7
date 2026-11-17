@@ -38,6 +38,17 @@ Route::get('/buku', [
 ])
 ->name('buku.index');
 
+// FORM TAMBAH BUKU - DILINDUNGI GATE
+
+Route::get('/buku/create', function () {
+    return redirect()->route('buku.index');
+})
+->middleware([
+    'auth',
+    'can:kelola-buku'
+])
+->name('buku.create');
+
 Route::get('/buku/{id}', [
     BukuController::class,
     'show'
@@ -48,14 +59,17 @@ Route::get('/buku/{id}', [
 ])
 ->name('buku.show');
 
-// PENGUJIAN CSRF A3
+// PENGHAPUSAN BUKU DENGAN GATE
 
 Route::delete('/buku/{buku}', [
     ApiBukuController::class,
     'destroy'
 ])
-->middleware('auth')
-->name('buku.hapus.get');
+->middleware([
+    'auth',
+    'can:kelola-buku'
+])
+->name('buku.destroy');
 
 // // PENGUJIAN SQL INJECTION A2
 

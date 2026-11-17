@@ -17,10 +17,18 @@ Route::middleware([
 });
 
 // Hanya Admin dan Petugas yang dapat mengelola buku
+// Route::middleware([
+//     'auth:sanctum',
+//     'permission:kelola data buku',
+// ])->group(function () {
+// Hanya Admin dan Petugas yang dapat mengelola buku melalui Gate
+
+// Hanya Admin dan Petugas yang dapat mengelola buku melalui Gate
 Route::middleware([
     'auth:sanctum',
-    'permission:kelola data buku',
+    'can:kelola-buku',
 ])->group(function () {
+
     Route::post('/buku', [BukuController::class, 'store'])
         ->name('api.buku.store');
 
@@ -31,7 +39,16 @@ Route::middleware([
 
     Route::delete('/buku/{buku}', [BukuController::class, 'destroy'])
         ->name('api.buku.destroy');
+
 });
+
+
+    // Route::delete('/buku/{buku}', [BukuController::class, 'destroy'])
+    //     ->name('api.buku.destroy');
+//     Route::delete('/buku/{buku}', [
+//     \App\Http\Controllers\Api\BukuController::class,
+//     'destroy'
+// ])->middleware('auth')->name('buku.destroy');
 
 
  // API Laporan Perpustakaan - Khusus Admin dan Petugas

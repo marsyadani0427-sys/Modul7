@@ -10,7 +10,7 @@
 <h2>Daftar Buku</h2>
 
 <div id="pesan" style="display:none; margin-bottom:12px; padding:10px;"></div>
-@can('kelola data buku')
+@can('kelola-buku')
 <form id="form-buku" novalidate style="margin-bottom:20px;">
     <input type="hidden" id="buku-id">
 
@@ -51,7 +51,7 @@
             <th>Judul</th>
             <th>Penulis</th>
             <th>Tahun Terbit</th>
-           @can('kelola data buku')
+           @can('kelola-buku')
                 <th>Aksi</th>
             @endcan
         </tr>
@@ -59,7 +59,7 @@
    
 <!-- <tbody id="isi-tabel">
     <tr>
-        <td colspan="{{ auth()->user()->can('kelola data buku') ? 6 : 5 }}">
+        <td colspan="{{ auth()->user()->can('kelola-buku') ? 6 : 5 }}">
             Memuat data...
         </td>
     </tr>
@@ -78,7 +78,7 @@
             <td>{{ $buku['penulis'] }}</td>
             <td>{{ $buku['tahun_terbit'] }}</td>
 
-            @can('kelola data buku')
+            @can('kelola-buku')
                 <td>
                     <button type="button"
                         onclick="mulaiUbah({{ $buku['id'] }})">
@@ -94,7 +94,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="{{ auth()->user()->can('kelola data buku') ? 6 : 5 }}">
+            <td colspan="{{ auth()->user()->can('kelola-buku') ? 6 : 5 }}">
                 Belum ada data buku.
             </td>
         </tr>
@@ -112,7 +112,7 @@
     const API_URL = '/api/buku';
 
     // Memeriksa permission pengguna yang sedang login
-    const BOLEH_KELOLA_BUKU = @json(auth()->user()->can('kelola data buku'));
+    const BOLEH_KELOLA_BUKU = @json(auth()->user()->can('kelola-buku'));
 
     // Siswa memiliki 5 kolom, Admin/Petugas memiliki 6 kolom
     const JUMLAH_KOLOM = BOLEH_KELOLA_BUKU ? 6 : 5;
