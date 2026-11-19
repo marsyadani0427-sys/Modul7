@@ -144,6 +144,7 @@
     async function kirimRequest(url, metode = 'GET', data = null) {
         const opsi = {
             method: metode,
+            credentials: 'same-origin',
             headers: { 'Accept': 'application/json' },
         };
 
