@@ -1,0 +1,7 @@
+.env
+.env.production
+/vendor
+/node_modules
+/tests
+/.git
+/.github
