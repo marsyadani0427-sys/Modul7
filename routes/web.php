@@ -10,7 +10,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 
-
 Route::get('/peminjaman/{id}', [
     PeminjamanController::class,
     'show'
@@ -301,7 +300,13 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// PENGUJIAN SOAL 5 NO. 11
+// Route::get('/uji-error', function () {
+//     throw new RuntimeException('Uji error APP_DEBUG');
+// });
 
-// AUTENTIKASI LARAVEL BREEZE
+//AUTENTIKASI LARAVEL BREEZE
 
 require __DIR__.'/auth.php';
+
+
