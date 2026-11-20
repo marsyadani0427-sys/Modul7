@@ -21,6 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
 
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+->withExceptions(function (Exceptions $exceptions): void {
+    $exceptions->report(function (\Throwable $e): void {
+        error_log(
+            'LARAVEL_ROOT_EXCEPTION: ' .
+            get_class($e) .
+            ' | ' . $e->getMessage() .
+            ' | ' . $e->getFile() .
+            ':' . $e->getLine()
+        );
+    });
+})->create();
