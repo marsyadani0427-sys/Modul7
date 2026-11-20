@@ -142,11 +142,19 @@
     }
 
     async function kirimRequest(url, metode = 'GET', data = null) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         const opsi = {
             method: metode,
             credentials: 'same-origin',
-            headers: { 'Accept': 'application/json' },
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
         };
+
+        if (csrfToken) {
+            opsi.headers['X-CSRF-TOKEN'] = csrfToken;
+        }
 
         if (data !== null) {
             opsi.headers['Content-Type'] = 'application/json';

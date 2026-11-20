@@ -105,6 +105,18 @@ if (empty($_ENV['LOG_CHANNEL']) && empty(getenv('LOG_CHANNEL'))) {
     $_ENV['LOG_CHANNEL'] = 'stderr';
 }
 
+// Pastikan host domain saat ini terdaftar di SANCTUM_STATEFUL_DOMAINS
+if (!empty($_SERVER['HTTP_HOST'])) {
+    $currentHost = $_SERVER['HTTP_HOST'];
+    $existing = (string) (getenv('SANCTUM_STATEFUL_DOMAINS') ?: ($_ENV['SANCTUM_STATEFUL_DOMAINS'] ?? ''));
+    if (!str_contains($existing, $currentHost)) {
+        $updated = $existing ? "{$existing},{$currentHost}" : $currentHost;
+        putenv("SANCTUM_STATEFUL_DOMAINS={$updated}");
+        $_ENV['SANCTUM_STATEFUL_DOMAINS'] = $updated;
+        $_SERVER['SANCTUM_STATEFUL_DOMAINS'] = $updated;
+    }
+}
+
 // 4. Normalisasi SCRIPT_NAME & SCRIPT_FILENAME agar router Laravel membaca path secara akurat
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = dirname(__DIR__) . '/public/index.php';
