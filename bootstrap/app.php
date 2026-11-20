@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -29,6 +30,19 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 ' | ' . $e->getFile() .
                 ':' . $e->getLine()
             );
+        });
+
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->has('debug') || config('app.debug')) {
+                return response()->json([
+                    'status' => 'EXCEPTION_CAUGHT',
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 10),
+                ], 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            }
         });
     })->create();
 
